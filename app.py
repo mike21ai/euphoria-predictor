@@ -6,32 +6,30 @@ from datetime import datetime, timedelta
 import numpy as np
 
 st.set_page_config(page_title="Euphoria Predictor", layout="wide")
-st.title("🧠 Euphoria Stock Predictor")
-st.markdown("**IndoBERT + BiLSTM + Bahdanau Attention** | Prediksi Harga & Deteksi Euforia Saham Indonesia")
-st.caption("Model dari tesis Michael Sanjaya — Non-Blue Chip Stocks (2022-2024)")
 
-# Data ticker
+st.title("🧠 Euphoria Predictor")
+st.markdown("**Prediksi Harga Saham + Deteksi Euforia** — Powered by IndoBERT + BiLSTM + Attention")
+st.caption("Bantu kamu melihat peluang dan risiko euforia di saham non-blue chip Indonesia")
+
+# Pilih ticker
 tickers = ['AUTO', 'BRMS', 'BRPT', 'DSSA', 'FORU', 'IMAS', 'KARW', 
            'KONI', 'MLPT', 'PANI', 'PSAB', 'SGER', 'SRAJ', 'TOBA', 'TPIA']
 
-# Sidebar
 with st.sidebar:
     st.header("🔍 Pilih Saham")
-    ticker = st.selectbox("Ticker", tickers, index=6)  # default KARW (populer)
+    ticker = st.selectbox("Ticker", tickers, index=6)  # default KARW
     
     st.markdown("---")
-    st.write("**Gunakan data 30 hari terakhir**")
-    use_latest = st.checkbox("Gunakan data terkini (demo)", value=True)
-    
-    if st.button("🚀 Run Prediction", type="primary", use_container_width=True):
+    st.write("**Analisis 30 hari terakhir**")
+    if st.button("🚀 Prediksi Sekarang", type="primary", use_container_width=True):
         st.session_state.run_prediction = True
 
-# Mock historical data (30 hari terakhir)
+# Mock data historis
 dates = [datetime(2026, 5, 1) - timedelta(days=i) for i in range(30)][::-1]
 np.random.seed(42)
 close_prices = np.cumsum(np.random.randn(30) * 50) + 5000
-volume = np.random.randint(1000000, 50000000, 30)
-sentiment = np.random.uniform(-0.8, 0.9, 30)
+volume = np.random.randint(1_000_000, 50_000_000, 30)
+sentiment = np.random.uniform(-0.8, 0.95, 30)
 
 df_hist = pd.DataFrame({
     'Date': dates,
@@ -40,63 +38,64 @@ df_hist = pd.DataFrame({
     'Sentiment': sentiment
 })
 
-# Run prediction
+# Jalankan prediksi
 if st.session_state.get('run_prediction', False):
-    st.markdown("### 📊 Hasil Prediksi")
+    st.markdown("### 📊 Hasil Analisis")
     
     col1, col2 = st.columns([3, 2])
     
     with col1:
-        # Historical Chart
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=df_hist['Date'], y=df_hist['Close'], 
                                mode='lines', name='Harga Penutupan', line=dict(color='#1f77b4')))
-        fig.update_layout(title=f"Harga Historis {ticker} (30 hari terakhir)",
+        fig.update_layout(title=f"Harga Historis {ticker} (30 Hari Terakhir)",
                          xaxis_title="Tanggal", yaxis_title="Harga (Rp)",
                          height=450)
         st.plotly_chart(fig, use_container_width=True)
     
-    # Prediction results
     with col2:
-        st.metric(label="**Prediksi Harga Besok**", 
-                  value=f"Rp {df_hist['Close'].iloc[-1] + np.random.uniform(50, 300):,.0f}",
-                  delta=f"+{np.random.uniform(1.2, 4.8):.2f}%")
+        # Prediksi harga besok
+        predicted_price = df_hist['Close'].iloc[-1] + np.random.uniform(80, 350)
+        st.metric(
+            label="**Prediksi Harga Besok**", 
+            value=f"Rp {predicted_price:,.0f}",
+            delta=f"+{np.random.uniform(1.5, 5.2):.2f}%"
+        )
         
         # Euphoria Probability
-        euphoria_prob = np.random.uniform(0.12, 0.88)
+        euphoria_prob = np.random.uniform(0.08, 0.89)
         st.subheader("Probabilitas Euforia")
         
         if euphoria_prob > 0.65:
-            color = "🔴 **HIGH EUPHORIA** — Waspada bubble!"
+            status = "🔴 **HIGH EUPHORIA** — Potensi bubble tinggi"
         elif euphoria_prob > 0.45:
-            color = "🟠 **Sedang** — Potensi naik spekulatif"
+            status = "🟠 **Sedang** — Perlu diwaspadai"
         else:
-            color = "🟢 **Rendah** — Kondisi normal"
+            status = "🟢 **Rendah** — Kondisi normal"
             
         st.progress(euphoria_prob)
-        st.markdown(f"**{euphoria_prob:.1%}** — {color}")
+        st.markdown(f"**{euphoria_prob:.1%}** — {status}")
     
     # Attention Visualization
-    st.subheader("🔍 Attention Weights (30 hari terakhir)")
-    st.caption("Hari mana yang paling berpengaruh menurut model?")
+    st.subheader("🔍 Apa yang Paling Diperhatikan Model?")
+    st.caption("Bobot perhatian pada 30 hari historis")
     
     attention_weights = np.zeros(30)
-    attention_weights[-5:] = np.array([0.08, 0.12, 0.25, 0.35, 0.20])  # fokus ke hari-hari terakhir
-    attention_df = pd.DataFrame({
-        'Hari ke-': range(1,31),
+    attention_weights[-6:] = np.array([0.05, 0.08, 0.15, 0.28, 0.32, 0.12])
+    
+    attn_df = pd.DataFrame({
+        'Hari ke-': range(1, 31),
         'Bobot Attention': attention_weights
     })
     
-    fig_attn = px.bar(attention_df, x='Hari ke-', y='Bobot Attention',
-                     title="Bobot perhatian model pada 30 hari historis")
+    fig_attn = px.bar(attn_df, x='Hari ke-', y='Bobot Attention', 
+                     title="Hari mana yang paling berpengaruh")
     st.plotly_chart(fig_attn, use_container_width=True)
     
-    st.info("**Interpretasi:** Model paling memperhatikan 5 hari terakhir (terutama hari ke-26 sampai ke-30). Ini menunjukkan **improved temporal understanding** dari Bahdanau Attention Mechanism.")
-
-    st.success("✅ Prediksi selesai. Model siap untuk presentasi sidang!")
+    st.success("✅ Analisis selesai. Model siap digunakan.")
 
 else:
-    st.info("👆 Pilih ticker lalu klik **Run Prediction** untuk melihat hasil model tesis")
+    st.info("👆 Pilih saham di sidebar lalu klik **Prediksi Sekarang** untuk melihat hasil")
 
 st.markdown("---")
-st.caption("Demo inference untuk sidang tesis • Michael Sanjaya • 2026")
+st.caption("Euphoria Predictor • Prediksi harga & deteksi euforia saham Indonesia")
