@@ -25,7 +25,6 @@ st.markdown("""
 
 @st.cache_data
 def fetch_real_market_data(ticker):
-    # Mengambil data 2022-2024
     ticker_symbol = f"{ticker}.JK"
     df = yf.download(ticker_symbol, start="2022-01-01", end="2024-12-31", progress=False)
     
@@ -33,7 +32,6 @@ def fetch_real_market_data(ticker):
         df.columns = df.columns.get_level_values(0)
         
     df = df.reset_index()
-    # Pastikan kolom Date ada
     if 'Date' not in df.columns:
         df.rename(columns={df.columns[0]: 'Date'}, inplace=True)
     
@@ -45,12 +43,11 @@ def fetch_real_market_data(ticker):
     rs = gain / loss
     df['RSI'] = 100 - (100 / (1 + rs))
     
-    # Simulasi data Tweet/Sentimen (Placeholder Riset)
+    # Simulasi data Tweet/Sentimen
     df['tweet_count'] = np.random.randint(10, 100, size=len(df))
     df['is_euphoric'] = 0
     df['prob'] = np.random.uniform(0.0, 0.5, size=len(df))
     
-    # Anomali simulasi untuk demo
     spike_indices = np.random.choice(df.index, 5, replace=False)
     df.loc[spike_indices, 'tweet_count'] = np.random.randint(500, 2000, size=5)
     df.loc[spike_indices, 'is_euphoric'] = 1
@@ -93,8 +90,3 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
-```
-
-**Tips untuk GitHub:**
-*   Jangan lupa untuk memutakhirkan `requirements.txt` Anda dengan `yfinance` agar *server* Streamlit Cloud bisa menarik data bursa.
-*   Jika Anda memiliki file CSV data asli Anda sendiri, Anda bisa mengganti fungsi `fetch_real_market_data` di atas dengan `pd.read_csv('data_anda.csv')` dan menyesuaikan kolomnya agar hasil prediksinya lebih akurat.
