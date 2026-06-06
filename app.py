@@ -369,10 +369,10 @@ elif main_nav == "Stock Analysis":
                     fig.add_hline(y=30, line_dash="dot", line_color="rgba(63, 185, 80, 0.7)", row=3, col=1)
                     fig.update_yaxes(range=[0, 100], row=3, col=1)
 
-                # X Unified Hover creates the vertical line down to all subplots
-                fig.update_xaxes(showspikelines=True, spikemode='across', spikethickness=1, spikedash='dot', spikecolor='#8b949e')
-                
-                fig.update_layout(
+            # X Unified Hover creates the vertical line down to all subplots
+            fig.update_xaxes(showspikelines=True, spikethickness=1, spikedash='dot', spikecolor='#8b949e')
+            
+            fig.update_layout(
                     plot_bgcolor='#0d1117', paper_bgcolor='#161b22', font_color='#8b949e',
                     height=700, margin=dict(l=5, r=5, t=10, b=5),
                     xaxis_rangeslider_visible=False, hovermode="x unified",
