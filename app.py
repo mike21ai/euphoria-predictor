@@ -36,7 +36,7 @@ st.markdown("""
 @st.cache_data
 def fetch_real_market_data(ticker):
     ticker_symbol = f"{ticker}.JK"
-    df = yf.download(ticker_symbol, period="6mo", progress=False)
+    df = yf.download(ticker_symbol, start="2022-01-01", end="2024-12-31", progress=False)
     
     # 1. Ratakan format kolom multi-index SEBELUM reset_index
     if isinstance(df.columns, pd.MultiIndex):
@@ -132,8 +132,8 @@ with col_main:
     st.markdown("##### 📈 Candlestick & Sinyal Euforia (TradingView Style)")
     
     # Plotly Candlestick (Interaktif: Bisa drag, zoom, hover)
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
-                        vertical_spacing=0.03, row_heights=[0.7, 0.3])
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
+                        vertical_spacing=0.03, row_heights=[0.6, 0.2, 0.2])
     
     # 1. Candlestick Chart Riil
     fig.add_trace(go.Candlestick(x=df['Date'],
@@ -156,13 +156,22 @@ with col_main:
     fig.add_trace(go.Bar(x=df['Date'], y=df['tweet_count'], name="Volume Tweet (AI)", 
                          marker_color='rgba(99, 102, 241, 0.8)'), row=2, col=1)
 
+    # 5. RSI Chart Indicator
+    fig.add_trace(go.Scatter(x=df['Date'], y=df['RSI'], name="RSI (14)", 
+                            line=dict(color='#06b6d4', width=1.5)), row=3, col=1)
+    # Garis Overbought (70) dan Oversold (30)
+    fig.add_hline(y=70, line_dash="dash", line_color="#ef4444", line_width=1, row=3, col=1, opacity=0.6)
+    fig.add_hline(y=30, line_dash="dash", line_color="#22c55e", line_width=1, row=3, col=1, opacity=0.6)
+
     fig.update_layout(
         plot_bgcolor='#0a0e17', paper_bgcolor='#0a0e17', font_color='#e2e8f0',
-        height=550, margin=dict(l=0, r=0, t=10, b=0),
+        height=700, margin=dict(l=0, r=0, t=10, b=0),
         xaxis_rangeslider_visible=False,  # Matikan bawaan plotly agar grafik lebih luas dan rapi
         hovermode="x unified", legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
-    fig.update_yaxes(showgrid=True, gridcolor='#1e293b')
+    fig.update_yaxes(showgrid=True, gridcolor='#1e293b', title_text="Harga", row=1, col=1)
+    fig.update_yaxes(showgrid=True, gridcolor='#1e293b', title_text="Vol Tweets", row=2, col=1)
+    fig.update_yaxes(showgrid=True, gridcolor='#1e293b', title_text="RSI", range=[0, 100], row=3, col=1)
     fig.update_xaxes(showgrid=True, gridcolor='#1e293b')
     
     st.plotly_chart(fig, use_container_width=True)
