@@ -37,12 +37,18 @@ st.markdown("""
 def fetch_real_market_data(ticker):
     ticker_symbol = f"{ticker}.JK"
     df = yf.download(ticker_symbol, period="6mo", progress=False)
+    
+    # 1. Ratakan format kolom multi-index SEBELUM reset_index
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
+        
+    # 2. Reset index agar tanggal menjadi kolom
     df = df.reset_index()
     
-    # Ratakan format kolom multi-index (Bawaan library yfinance terbaru)
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = [col[0] for col in df.columns]
-        
+    # 3. Paksa ganti nama kolom pertama (indeks waktu) menjadi 'Date'
+    # Ini mengatasi isu KeyError akibat perbedaan versi yfinance
+    df.rename(columns={df.columns[0]: 'Date'}, inplace=True)
+    
     # Hitung indikator teknikal riil
     df['MA20'] = df['Close'].rolling(window=20).mean()
     
