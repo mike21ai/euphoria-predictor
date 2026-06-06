@@ -373,18 +373,18 @@ elif main_nav == "Stock Analysis":
             fig.update_xaxes(showspikelines=True, spikethickness=1, spikedash='dot', spikecolor='#8b949e')
             
             fig.update_layout(
-                    plot_bgcolor='#0d1117', paper_bgcolor='#161b22', font_color='#8b949e',
-                    height=700, margin=dict(l=5, r=5, t=10, b=5),
-                    xaxis_rangeslider_visible=False, hovermode="x unified",
-                    showlegend=False
-                )
-                fig.update_yaxes(gridcolor='#30363d', zerolinecolor='#30363d')
-                fig.update_xaxes(gridcolor='#30363d', zerolinecolor='#30363d')
+                plot_bgcolor='#0d1117', paper_bgcolor='#161b22', font_color='#8b949e',
+                height=700, margin=dict(l=5, r=5, t=10, b=5),
+                xaxis_rangeslider_visible=False, hovermode="x unified",
+                showlegend=False
+            )
+            fig.update_yaxes(gridcolor='#30363d', zerolinecolor='#30363d')
+            fig.update_xaxes(gridcolor='#30363d', zerolinecolor='#30363d')
 
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown("</div>", unsafe_allow_html=True)
+            st.plotly_chart(fig, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-            with right_col:
+        with right_col:
                 st.markdown("<div class='panel-container'>", unsafe_allow_html=True)
                 st.markdown("<div class='panel-header'>AI INFERENCE ENGINE</div>", unsafe_allow_html=True)
                 
